@@ -13,3 +13,8 @@ type Player struct {
 	ELORating  sql.NullInt64  `db:"elo_rating"`
 	TotalPrize sql.NullInt64  `db:"total_prize"`
 }
+
+type Match struct {
+	Player1 Player
+	Player2 Player
+}

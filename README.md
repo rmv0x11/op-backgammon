@@ -8,6 +8,6 @@
 —user auth  
 —profile data  
 —new game(game options)  
-—tournament  
+—tournament
 —leaderbord
 

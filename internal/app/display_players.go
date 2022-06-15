@@ -1,10 +1,14 @@
 package app
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 func (i *Implementation) DisplayPlayers() error {
 	players, err := i.db.GetPlayers()
 	if err != nil {
+		log.Fatalln("DisplayPlayers error:", err.Error())
 		return err
 	}
 
@@ -15,5 +19,5 @@ func (i *Implementation) DisplayPlayers() error {
 			v.LastName.String,
 		)
 	}
-	return nil
+	return err
 }

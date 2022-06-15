@@ -1,45 +1,21 @@
 package app
 
 import (
-	"context"
-	"database/sql"
-	"github.com/rmv0x11/op-backgammon/internal/storage"
-	"log"
-	"os"
+	"github.com/gin-gonic/gin"
+	"github.com/rmv0x11/op-backgammon/internal/service"
 )
 
 type Implementation struct {
-	db *storage.Database
+	svc *service.Service
+	r   *gin.Engine
 }
 
-func NewBackgammonAPI(ctx context.Context) *Implementation {
-	dsn := "backgammon.db"
+func NewBackgammonAPI() *Implementation {
+	svc := service.NewService()
 
-	//if _, err := os.Open(dsn); err != nil {
-	//	err = createDBFile(dsn)
-	//	if err != nil {
-	//		return nil
-	//	}
-	//}
-	db := storage.NewStorage(getSQLite(dsn))
-	return &Implementation{db: db}
-}
-
-func getSQLite(dsn string) *sql.DB {
-	sqliteDB, _ := sql.Open("sqlite3", dsn)
-	return sqliteDB
+	return &Implementation{svc: svc, r: gin.New()}
 }
 
 func (i *Implementation) Close() error {
-	return i.db.Close()
-}
-
-func createDBFile(name string) error {
-	file, err := os.Create(name)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = file.Close()
-
-	return err
+	return i.Close()
 }
