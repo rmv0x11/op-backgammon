@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"context"
 	"database/sql"
+	"github.com/gin-gonic/gin"
 	"log"
 )
 
@@ -26,7 +26,7 @@ func (d *Database) Close() error {
 }
 
 //CreatePlayersTable creates new table Players in Storage
-func (d *Database) CreatePlayersTable(ctx context.Context) error {
+func (d *Database) CreatePlayersTable() error {
 	createTable := `CREATE TABLE IF NOT EXISTS players (
 		"player_id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"first_name" TEXT,
@@ -38,6 +38,7 @@ func (d *Database) CreatePlayersTable(ctx context.Context) error {
 		"elo_rating" integer,
 		"total_prize" integer
 		);`
+
 	log.Println("Create players table...")
 
 	stmt, err := d.db.Prepare(createTable)
@@ -46,6 +47,8 @@ func (d *Database) CreatePlayersTable(ctx context.Context) error {
 		return err
 	}
 
+	log.Println("Create players table...")
+
 	_, err = stmt.Exec()
 	if err != nil {
 		log.Fatalln("CreatePlayersTable exec error:", err.Error())
@@ -53,12 +56,11 @@ func (d *Database) CreatePlayersTable(ctx context.Context) error {
 	}
 
 	log.Println("players table created")
+
 	return err
 }
 
 func (d *Database) InsertPlayer(player *Player) error {
-	log.Println("inserting new player record...", player.FirstName)
-
 	insertPlayer := `INSERT INTO players(first_name, last_name) VALUES (?, ?)`
 
 	stmt, err := d.db.Prepare(insertPlayer)
@@ -73,10 +75,12 @@ func (d *Database) InsertPlayer(player *Player) error {
 		return err
 	}
 
+	log.Println("inserting new player record...")
+
 	return err
 }
 
-func (d *Database) GetPlayers() ([]*Player, error) {
+func (d *Database) GetPlayers(c *gin.Context) ([]*Player, error) {
 	rows, err := d.db.Query("SELECT * FROM players")
 	if err != nil {
 		log.Fatal("GetPlayers query error:", err.Error())

@@ -1,7 +1,9 @@
 package app
 
-import "context"
+import (
+	"github.com/gin-gonic/gin"
+)
 
-func (i *Implementation) CreatePlayersTable(ctx context.Context) error {
-	return i.db.CreatePlayersTable(ctx)
+func (i *Implementation) CreatePlayersTable(c *gin.Context) {
+	i.svc.CreatePlayersTable(c)
 }

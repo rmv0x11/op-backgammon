@@ -2,14 +2,14 @@ package app
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 )
 
-func (i *Implementation) DisplayPlayers() error {
-	players, err := i.db.GetPlayers()
+func (i *Implementation) GetPlayers(c *gin.Context) {
+	players, err := i.svc.GetPlayers(c)
 	if err != nil {
-		log.Fatalln("DisplayPlayers error:", err.Error())
-		return err
+		log.Fatalln("DisplayPlayers error:", err)
 	}
 
 	for _, v := range players {
@@ -19,5 +19,4 @@ func (i *Implementation) DisplayPlayers() error {
 			v.LastName.String,
 		)
 	}
-	return err
 }

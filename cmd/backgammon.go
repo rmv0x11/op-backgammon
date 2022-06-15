@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 	"github.com/rmv0x11/op-backgammon/internal/app"
@@ -10,24 +9,21 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	//ctx := context.Background()
 
 	os.Remove("backgammon.db")
 
 	impl := app.NewBackgammonAPI()
 	defer impl.Close()
 
-	router := gin.Default()
-	router.POST("/add_player", impl.AddPlayer())
-	router.Run(":1337")
+	router := gin.New()
+	router.POST("/add_player", impl.AddPlayer)
+	router.POST("/create_players_table", impl.CreatePlayersTable)
+	router.GET("/get_players", impl.GetPlayers)
 
-	err := impl.DisplayPlayers()
+	err := router.Run(":1337") //TODO port moved into config
 	if err != nil {
-		log.Fatalln("cannot display players, err:", err)
+		log.Fatalf("unable to start the service on port 1337 , error:%s", err.Error())
+		return
 	}
-
-}
-
-func AddPlayer(c *gin.Context) {
-
 }
