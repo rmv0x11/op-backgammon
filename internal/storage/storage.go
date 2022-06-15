@@ -112,3 +112,36 @@ func (d *Database) GetPlayers(c *gin.Context) ([]*Player, error) {
 
 	return players, nil
 }
+
+func (d *Database) GetPlayerInfo(id int) (*Player, error) {
+	row, err := d.db.Query(`SELECT * FROM players
+		WHERE player_id=?`,
+		id,
+	)
+	defer row.Close()
+
+	if err != nil {
+		log.Fatal("GetPlayerInfo query error:", err.Error())
+	}
+
+	player := new(Player)
+
+	scanErr := row.Scan(
+		&player.PlayerID,
+		&player.FirstName,
+		&player.LastName,
+		&player.TotalGames,
+		&player.WinGames,
+		&player.LoseGames,
+		&player.MarsGames,
+		&player.ELORating,
+		&player.TotalPrize,
+	)
+
+	if scanErr != nil {
+		log.Fatalln("GetPlayerInfo scan error:", scanErr)
+		return nil, scanErr
+	}
+
+	return player, nil
+}

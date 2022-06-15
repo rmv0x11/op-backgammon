@@ -20,6 +20,7 @@ func main() {
 	router.POST("/add_player", impl.AddPlayer)
 	router.POST("/create_players_table", impl.CreatePlayersTable)
 	router.GET("/get_players", impl.GetPlayers)
+	router.POST("/new_match", impl.NewMatch)
 
 	err := router.Run(":1337") //TODO port moved into config
 	if err != nil {
