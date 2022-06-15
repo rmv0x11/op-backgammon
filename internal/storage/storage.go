@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"database/sql"
-	"github.com/rmv0x11/op-backgammon/internal/model"
 	"log"
 )
 
@@ -18,7 +17,7 @@ func NewStorage(db *sql.DB) *Database {
 
 //CreatePlayersTable creates new table Players in Storage
 func (d *Database) CreatePlayersTable(ctx context.Context) {
-	createTable := `CREATE TABLE players (
+	createTable := `CREATE TABLE IF NOT EXISTS players (
 		"player_id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"first_name" TEXT,
 		"last_name" TEXT,
@@ -27,7 +26,7 @@ func (d *Database) CreatePlayersTable(ctx context.Context) {
 		"lose_games" integer,
 		"mars_games" integer,
 		"elo_rating" integer,
-		"total_prize"
+		"total_prize" integer
 		);`
 	log.Println("Create players table...")
 
@@ -40,7 +39,7 @@ func (d *Database) CreatePlayersTable(ctx context.Context) {
 	log.Println("players table created")
 }
 
-func (d *Database) InsertPlayer(player *model.Player) {
+func (d *Database) InsertPlayer(player *Player) {
 	log.Println("inserting new player record...", player.FirstName)
 
 	insertPlayer := `INSERT INTO players(first_name, last_name) VALUES (?, ?)`
@@ -55,20 +54,33 @@ func (d *Database) InsertPlayer(player *model.Player) {
 	}
 }
 
-func (d *Database) GetPlayers() []*model.Player {
-	row, err := d.Query("SELECT * FROM players")
+func (d *Database) GetPlayers() ([]*Player, error) {
+	rows, err := d.Query("SELECT * FROM players")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer row.Close()
+	defer rows.Close()
 
-	players := make([]*model.Player, 0)
-	for row.Next() {
-		player := new(model.Player)
-		row.Scan(&player)
+	players := make([]*Player, 0)
+	for rows.Next() {
+		player := new(Player)
+		scanErr := rows.Scan(
+			&player.PlayerID,
+			&player.FirstName,
+			&player.LastName,
+			&player.TotalGames,
+			&player.WinGames,
+			&player.LoseGames,
+			&player.MarsGames,
+			&player.ELORating,
+			&player.TotalPrize,
+		)
+		if scanErr != nil {
+			return nil, scanErr
+		}
 		players = append(players, player)
 	}
-	return players
+	return players, nil
 }
 
 func (d *Database) Close() error {
