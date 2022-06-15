@@ -1,8 +1,13 @@
 # op-backgammon
 
-user auth
-profile data
-new game(game options)
-tournament
-leaderbord
+# Build:
+`go build cmd/backgammon.go`  
+`./backgammon`
+
+# Todo:  
+—user auth  
+—profile data  
+—new game(game options)  
+—tournament  
+—leaderbord
 
