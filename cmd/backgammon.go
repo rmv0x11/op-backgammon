@@ -17,8 +17,8 @@ func main() {
 	defer impl.Close()
 
 	router := gin.New()
-	router.POST("/add_player", impl.AddPlayer)
 	router.POST("/create_players_table", impl.CreatePlayersTable)
+	router.POST("/add_player", impl.AddPlayer)
 	router.GET("/get_players", impl.GetPlayers)
 	router.GET("/new_match", impl.NewMatch)
 

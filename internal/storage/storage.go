@@ -145,3 +145,69 @@ func (d *Database) GetPlayerInfo(id int) (*Player, error) {
 
 	return player, nil
 }
+
+func (d *Database) CreateMatchesTable() error {
+	createTable := `CREATE TABLE IF NOT EXISTS matches (
+		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+		"length" int,
+		"status" text,
+		"rounds" text,
+		"player_one_id" int,
+		"player_two_id" int,
+		"date" timestamp
+		);`
+
+	log.Println("Create matches table...")
+
+	stmt, err := d.db.Prepare(createTable)
+	if err != nil {
+		log.Fatalln("CreateMatchesTable prepare error:", err.Error())
+		return err
+	}
+
+	log.Println("Create matches table...")
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatalln("CreateMatchesTable exec error:", err.Error())
+		return err
+	}
+
+	log.Println("matches table created")
+
+	return err
+}
+
+func (d *Database) CreateRoundsTable() error {
+	createTable := `CREATE TABLE IF NOT EXISTS rounds (
+		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+		"match_id" integer,
+		"winner_id" int,
+		"is_mars" boolean not null check (is_mars in (0,1)),
+		foreign key(match_id) references matches(id)
+		);`
+
+	log.Println("Create rounds table...")
+
+	stmt, err := d.db.Prepare(createTable)
+	if err != nil {
+		log.Fatalln("CreateRoundsTable prepare error:", err.Error())
+		return err
+	}
+
+	log.Println("Create rounds table...")
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatalln("CreateRoundsTable exec error:", err.Error())
+		return err
+	}
+
+	log.Println("rounds table created")
+
+	return err
+}
+
+func (d *Database) NewMatch() {
+
+}

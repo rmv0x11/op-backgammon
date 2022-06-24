@@ -10,7 +10,7 @@ func (s *Service) NewMatch(playerOneID, playerTwoID int) error {
 		return err
 	}
 
-	playerTwo, err := s.db.GetPlayerInfo(playerOneID)
+	playerTwo, err := s.db.GetPlayerInfo(playerTwoID)
 	if err != nil {
 		log.Fatalln("unable create new match, error", err.Error())
 		return err
