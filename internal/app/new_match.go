@@ -2,15 +2,33 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"log"
+	"strconv"
 )
 
 func (i *Implementation) NewMatch(c *gin.Context) {
-	playerOneID := c.Request.URL.Query().Get("player_one_id")
-	playerTwoID := c.Request.URL.Query().Get("player_two_id")
+	playerOneValue := c.Request.URL.Query().Get("player_one_id")
+	playerTwoValue := c.Request.URL.Query().Get("player_two_id")
+	lengthValue := c.Request.URL.Query().Get("length")
 
-	err := i.svc.NewMatch(playerOneID, playerTwoID)
+	playerOneID, err := strconv.ParseInt(playerOneValue, 10, 64)
 	if err != nil {
-		log.Fatalln("unable get info about new match")
+		log.Fatalln("can't parse player one query params, err:")
+	}
+	playerTwoID, err := strconv.ParseInt(playerTwoValue, 10, 64)
+	if err != nil {
+		log.Fatalln("can't parse player two query params, err: ", err)
+
+	}
+
+	length, err := strconv.ParseInt(lengthValue, 10, 64)
+	if err != nil {
+		log.Fatalln("can't parse length query params, err:")
+	}
+
+	err = i.svc.NewMatch(playerOneID, playerTwoID, length)
+	if err != nil {
+		log.Fatalln("unable get info about new match, err: ", err)
 	}
 }

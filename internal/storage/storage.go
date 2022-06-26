@@ -2,7 +2,6 @@ package storage
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin"
 	"log"
 )
 
@@ -80,7 +79,7 @@ func (d *Database) InsertPlayer(player *Player) error {
 	return err
 }
 
-func (d *Database) GetPlayers(c *gin.Context) ([]*Player, error) {
+func (d *Database) GetPlayers() ([]*Player, error) {
 	rows, err := d.db.Query("SELECT * FROM players")
 	if err != nil {
 		log.Fatal("GetPlayers query error:", err.Error())
@@ -92,7 +91,7 @@ func (d *Database) GetPlayers(c *gin.Context) ([]*Player, error) {
 		player := new(Player)
 
 		scanErr := rows.Scan(
-			&player.PlayerID,
+			&player.ID,
 			&player.FirstName,
 			&player.LastName,
 			&player.TotalGames,
@@ -127,7 +126,7 @@ func (d *Database) GetPlayerInfo(id int) (*Player, error) {
 	player := new(Player)
 
 	scanErr := row.Scan(
-		&player.PlayerID,
+		&player.ID,
 		&player.FirstName,
 		&player.LastName,
 		&player.TotalGames,
@@ -208,6 +207,27 @@ func (d *Database) CreateRoundsTable() error {
 	return err
 }
 
-func (d *Database) NewMatch() {
+func (d *Database) NewMatch(match *Match) error {
+	query := `INSERT INTO matches(player_one_id, player_two_id, length, date) VALUES (?, ?, ?, ?)`
 
+	stmt, err := d.db.Prepare(query)
+	if err != nil {
+		log.Fatalln("NewMatch prepare error:", err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(
+		match.PlayerOne.ID,
+		match.PlayerTwo.ID,
+		match.Length,
+		match.Date,
+	)
+	if err != nil {
+		log.Fatalln("NewMatch exec error:", err.Error())
+		return err
+	}
+
+	log.Println("new match created...")
+
+	return err
 }

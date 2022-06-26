@@ -1,22 +1,18 @@
 package service
 
-import "log"
+import (
+	"database/sql"
+	"github.com/rmv0x11/op-backgammon/internal/storage"
+	"time"
+)
 
-func (s *Service) NewMatch(playerOneID, playerTwoID int) error {
+func (s *Service) NewMatch(playerOneID, playerTwoID, length int64) error {
+	match := new(storage.Match)
+	match.PlayerOne = &storage.Player{ID: sql.NullInt64{playerOneID, true}}
+	match.PlayerTwo = &storage.Player{ID: sql.NullInt64{playerTwoID, true}}
+	match.Length = sql.NullInt64{length, true}
+	match.Date = sql.NullTime{time.Now(), true}
 
-	playerOne, err := s.db.GetPlayerInfo(playerOneID)
-	if err != nil {
-		log.Fatalln("unable create new match, error", err.Error())
-		return err
-	}
+	return s.db.NewMatch(match)
 
-	playerTwo, err := s.db.GetPlayerInfo(playerTwoID)
-	if err != nil {
-		log.Fatalln("unable create new match, error", err.Error())
-		return err
-	}
-
-	//TODO write main logic of calculation prematch stats from players info
-
-	return nil
 }
