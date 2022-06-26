@@ -207,16 +207,17 @@ func (d *Database) CreateRoundsTable() error {
 	return err
 }
 
-func (d *Database) NewMatch(match *Match) error {
-	query := `INSERT INTO matches(player_one_id, player_two_id, length, date) VALUES (?, ?, ?, ?)`
+func (d *Database) NewMatch(match *Match) (int64, error) {
+	query := `INSERT INTO matches(player_one_id, player_two_id, length, date) VALUES (?, ?, ?, ?);
+				SELECT last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
 		log.Fatalln("NewMatch prepare error:", err.Error())
-		return err
+		return 0, err
 	}
 
-	_, err = stmt.Exec(
+	res, err := stmt.Exec(
 		match.PlayerOne.ID,
 		match.PlayerTwo.ID,
 		match.Length,
@@ -224,10 +225,15 @@ func (d *Database) NewMatch(match *Match) error {
 	)
 	if err != nil {
 		log.Fatalln("NewMatch exec error:", err.Error())
-		return err
+		return 0, err
+	}
+
+	matchID, err := res.LastInsertId()
+	if err != nil {
+		log.Fatalln("can't get match_id, err: ", err.Error())
 	}
 
 	log.Println("new match created...")
 
-	return err
+	return matchID, err
 }

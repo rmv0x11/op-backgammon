@@ -2,10 +2,11 @@ package app
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 )
 
-func (i *Implementation) GetPlayers() {
+func (i *Implementation) GetPlayers(c *gin.Context) {
 	players, err := i.svc.GetPlayers()
 	if err != nil {
 		log.Fatalln("DisplayPlayers error:", err)

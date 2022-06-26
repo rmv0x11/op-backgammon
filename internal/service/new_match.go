@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (s *Service) NewMatch(playerOneID, playerTwoID, length int64) error {
+func (s *Service) NewMatch(playerOneID, playerTwoID, length int64) (int64, error) {
 	match := new(storage.Match)
 	match.PlayerOne = &storage.Player{ID: sql.NullInt64{playerOneID, true}}
 	match.PlayerTwo = &storage.Player{ID: sql.NullInt64{playerTwoID, true}}

@@ -27,8 +27,10 @@ func (i *Implementation) NewMatch(c *gin.Context) {
 		log.Fatalln("can't parse length query params, err:")
 	}
 
-	err = i.svc.NewMatch(playerOneID, playerTwoID, length)
+	matchID, err := i.svc.NewMatch(playerOneID, playerTwoID, length)
 	if err != nil {
 		log.Fatalln("unable get info about new match, err: ", err)
 	}
+
+	log.Println("new match has id:", matchID)
 }
