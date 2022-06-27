@@ -26,6 +26,10 @@ func NewBackgammonApp() *Application {
 		log.Fatalln("CreateRoundsTable, err: ", err)
 	}
 
+	if err := svc.CreateTournamentsTable(); err != nil {
+		log.Fatalln("CreateTournamentsTable, err: ", err)
+	}
+
 	return &Application{svc: svc, r: gin.New()}
 }
 

@@ -13,7 +13,7 @@ type Player struct {
 	LoseGames  sql.NullInt64  `db:"lose_games"`
 	MarsGames  sql.NullInt64  `db:"mars_games"`
 	ELORating  sql.NullInt64  `db:"elo_rating"`
-	TotalPrize sql.NullInt64  `db:"total_prize"`
+	TotalPrize sql.NullInt64  `db:"total_prize"` //TODO
 }
 
 type Match struct {
@@ -31,4 +31,12 @@ type Round struct {
 	MatchID  sql.NullInt64 `db:"match_id"`
 	WinnerID sql.NullInt64 `db:"winner_id"`
 	IsMars   sql.NullBool  `db:"is_mars"`
+}
+
+type Tournament struct {
+	ID       sql.NullInt64  `db:"id"`
+	Players  []*Player      `db:"players"`
+	WinnerID sql.NullInt64  `db:"winner_id"`
+	Status   sql.NullString `db:"status"`
+	Date     sql.NullTime   `db:"date"`
 }

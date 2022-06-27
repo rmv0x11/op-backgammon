@@ -169,8 +169,6 @@ func (d *Database) CreateMatchesTable() error {
 		return err
 	}
 
-	log.Println("Create matches table...")
-
 	_, err = stmt.Exec()
 	if err != nil {
 		log.Fatalln("CreateMatchesTable exec error:", err.Error())
@@ -198,8 +196,6 @@ func (d *Database) CreateRoundsTable() error {
 		log.Fatalln("CreateRoundsTable prepare error:", err.Error())
 		return err
 	}
-
-	log.Println("Create rounds table...")
 
 	_, err = stmt.Exec()
 	if err != nil {
@@ -272,4 +268,32 @@ func (d *Database) NewRound(r *Round) (int64, error) {
 
 	return roundID, err
 
+}
+
+func (d *Database) CreateTournamentTables() error {
+	createTable := `create table if not exists tournaments (
+		id integer not null primary key autoincrement,
+		players text,
+		winner_id integer,
+		status text,
+		date timestamp;
+		select last_insert_rowid();'`
+
+	log.Println("Create tournaments table...")
+
+	stmt, err := d.db.Prepare(createTable)
+	if err != nil {
+		log.Fatalln("CreateTournamentsTable prepare error:", err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatalln("CreateTournamentsTable exec error:", err.Error())
+		return err
+	}
+
+	log.Println("tournaments table created")
+
+	return err
 }
