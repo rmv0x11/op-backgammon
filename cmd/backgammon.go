@@ -22,6 +22,7 @@ func main() {
 	router.GET("/get_players", a.GetPlayers)
 	router.POST("/new_match", a.NewMatch)
 	router.POST("/new_round", a.NewRound)
+	router.POST("/new_tournament", a.NewTournament)
 
 	err := router.Run(":1337") //TODO port moved into config
 	if err != nil {

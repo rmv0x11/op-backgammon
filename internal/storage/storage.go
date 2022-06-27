@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"log"
+	"time"
 )
 
 type Database struct {
@@ -267,7 +268,6 @@ func (d *Database) NewRound(r *Round) (int64, error) {
 	log.Println("new round added...")
 
 	return roundID, err
-
 }
 
 func (d *Database) CreateTournamentTables() error {
@@ -296,4 +296,34 @@ func (d *Database) CreateTournamentTables() error {
 	log.Println("tournaments table created")
 
 	return err
+}
+
+func (d *Database) NewTournament(IDs string) (int64, error) {
+	query := `insert into tournaments(players, status, date) values (?, ?, ?);
+		SELECT last_insert_rowid();`
+
+	stmt, err := d.db.Prepare(query)
+	if err != nil {
+		log.Fatalln("NewTournament prepare error:", err.Error())
+		return 0, err
+	}
+
+	res, err := stmt.Exec(
+		IDs,
+		"Tournament created",
+		time.Now(),
+	)
+	if err != nil {
+		log.Fatalln("NewRound exec error:", err.Error())
+		return 0, err
+	}
+
+	tournamentID, err := res.LastInsertId()
+	if err != nil {
+		log.Fatalln("can't get tournament_id, err: ", err.Error())
+	}
+
+	log.Println("new tournament added...")
+
+	return tournamentID, err
 }
