@@ -19,13 +19,16 @@ type Player struct {
 }
 
 type Match struct {
-	ID        int64
-	Length    int64
-	Status    string
-	Rounds    []*Round
-	PlayerOne *Player
-	PlayerTwo *Player
-	Date      time.Time
+	ID              int64
+	Length          int64
+	PlayerOnePoints int64
+	PlayerTwoPoints int64
+	Status          string
+	Rounds          []*Round
+	PlayerOne       *Player
+	PlayerTwo       *Player
+	DateCreated     time.Time
+	DateUpdated     time.Time
 }
 
 type Round struct {
@@ -34,12 +37,14 @@ type Round struct {
 	WinnerID int64
 	LoserID  int64
 	IsMars   bool
+	Date     time.Time
 }
 
 type Tournament struct {
-	ID       int64
-	Players  []*Player
-	WinnerID int64
-	Status   string
-	Date     time.Time
+	ID          int64
+	Players     []*Player
+	WinnerID    int64
+	Status      string
+	DateCreated time.Time
+	DateUpdated time.Time
 }

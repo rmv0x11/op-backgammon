@@ -7,6 +7,7 @@ import (
 	"github.com/rmv0x11/op-backgammon/internal/storage"
 	"log"
 	"math"
+	"time"
 )
 
 func (s *Service) NewRound(matchID, winnerID, loserID int64, isMars bool) (int64, error) {
@@ -15,6 +16,7 @@ func (s *Service) NewRound(matchID, winnerID, loserID int64, isMars bool) (int64
 	r.WinnerID = sql.NullInt64{winnerID, true}
 	r.LoserID = sql.NullInt64{loserID, true}
 	r.IsMars = sql.NullBool{isMars, true}
+	r.Date = sql.NullTime{time.Now(), true}
 
 	{
 		winner, err := s.db.GetPlayer(winnerID)
@@ -66,9 +68,9 @@ func updatePlayer(p *model.Player, isWinner, isMars bool) *model.Player {
 //
 //L = P * M * S , где:
 //P = 1 / (1 + pow(10,(-D * sqrt(N) / 2000)))
-func updateELO(p, m, s) int64 {
-
-}
+//func updateELO(p, m, s) int64 {
+//
+//}
 
 func calculateProbability(length, diff float64) float64 {
 	return 1 / (1 + math.Pow(10, -diff*math.Sqrt(length)/2000))

@@ -165,6 +165,8 @@ func (d *Database) CreateMatchesTable() error {
 	createTable := `create table if not exists matches (
 		id integer not null primary key autoincrement,
 		length int,
+		player_one_points int,
+		player_two_points int,
 		status text,
 		rounds text,
 		player_one_id int,
@@ -220,8 +222,15 @@ func (d *Database) CreateRoundsTable() error {
 }
 
 func (d *Database) NewMatch(m *Match) (int64, error) {
-	query := `insert into matches(player_one_id, player_two_id, length, date) values (?, ?, ?, ?);
-				select last_insert_rowid();`
+	query := `insert into matches(
+			player_one_id,
+			player_two_id,
+			player_one_points,
+			player_two_points,
+			length,
+			date_created) 
+		values (?, ?, ?, ?, ?, ?);
+			select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
@@ -232,8 +241,10 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 	res, err := stmt.Exec(
 		m.PlayerOne.ID,
 		m.PlayerTwo.ID,
+		m.PlayerOnePoints.Int64,
+		m.PlayerTwoPoints.Int64,
 		m.Length,
-		m.Date,
+		m.DateCreated,
 	)
 	if err != nil {
 		log.Fatalln("new match exec error:", err.Error())
@@ -250,8 +261,39 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 	return matchID, err
 }
 
+func (d *Database) UpdateMatch(m *Match) error {
+	query := `update matches
+		set player_one_points = ?,
+			player_two_points = ?,
+			status = ?,
+			rounds = ?,
+			date_updated = ?
+		where id = ?;`
+
+	stmt, err := d.db.Prepare(query)
+	if err != nil {
+		log.Fatalln("update match prepare error:", err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(
+		m.PlayerOnePoints,
+		m.PlayerTwoPoints,
+		m.Status,
+		m.Rounds,
+		m.DateUpdated,
+	)
+
+	if err != nil {
+		log.Fatalln("update match exec error:", err.Error())
+		return err
+	}
+
+	return err
+}
+
 func (d *Database) NewRound(r *Round) (int64, error) {
-	query := `insert into rounds(match_id, winner_id,loser_id, is_mars) values (?, ?, ?, ?);
+	query := `insert into rounds(match_id, winner_id,loser_id, is_mars,date) values (?, ?, ?, ?, ?);
 		select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
@@ -265,6 +307,7 @@ func (d *Database) NewRound(r *Round) (int64, error) {
 		r.WinnerID,
 		r.LoserID,
 		r.IsMars,
+		r.Date,
 	)
 	if err != nil {
 		log.Fatalln("new round exec error:", err.Error())
@@ -369,5 +412,5 @@ func (d *Database) UpdatePlayer(p *Player) error {
 		return err
 	}
 
-	return nil
+	return err
 }

@@ -21,3 +21,18 @@ func PlayersForDB(p *model.Player) *storage.Player {
 		TotalPrize: sql.NullInt64{p.TotalPrize, true},
 	}
 }
+
+func MatchesForDB(m *model.Match) *storage.Match {
+	return &storage.Match{
+		ID:              sql.NullInt64{},
+		Length:          sql.NullInt64{},
+		PlayerOnePoints: sql.NullInt64{},
+		PlayerTwoPoints: sql.NullInt64{},
+		Status:          sql.NullString{},
+		Rounds:          m.Rounds,
+		PlayerOne:       nil,
+		PlayerTwo:       nil,
+		DateCreated:     sql.NullTime{},
+		DateUpdated:     sql.NullTime{},
+	}
+}
