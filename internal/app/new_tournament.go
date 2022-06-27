@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"strconv"
 )
 
 func (a *Application) NewTournament(c *gin.Context) {
@@ -13,5 +14,8 @@ func (a *Application) NewTournament(c *gin.Context) {
 		log.Fatalln("unable added new tournament, err:", err)
 	}
 
-	log.Println("new tournament has id:", tournamentID)
+	_, err = c.Writer.Write([]byte(strconv.FormatInt(tournamentID, 10)))
+	if err != nil {
+		log.Fatalln("can't write response, err:", err)
+	}
 }

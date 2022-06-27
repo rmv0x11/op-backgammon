@@ -32,5 +32,8 @@ func (a *Application) NewMatch(c *gin.Context) {
 		log.Fatalln("unable get info about new match, err: ", err)
 	}
 
-	log.Println("new match has id:", matchID)
+	_, err = c.Writer.Write([]byte(strconv.FormatInt(matchID, 10)))
+	if err != nil {
+		log.Fatalln("can't write response, err:", err)
+	}
 }

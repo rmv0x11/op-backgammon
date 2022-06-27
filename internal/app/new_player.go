@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rmv0x11/op-backgammon/internal/storage"
 	"log"
+	"strconv"
 )
 
 func (a *Application) NewPlayer(c *gin.Context) {
@@ -18,5 +19,9 @@ func (a *Application) NewPlayer(c *gin.Context) {
 	if err != nil {
 		log.Fatalln("AddPlayer handler error:", err.Error())
 	}
-	log.Println("new match has id:", playerID)
+
+	_, err = c.Writer.Write([]byte(strconv.FormatInt(playerID, 10)))
+	if err != nil {
+		log.Fatalln("can't write response, err:", err)
+	}
 }

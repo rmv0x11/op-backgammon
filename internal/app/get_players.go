@@ -1,8 +1,8 @@
 package app
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/rmv0x11/op-backgammon/internal/util"
 	"log"
 )
 
@@ -12,11 +12,10 @@ func (a *Application) GetPlayers(c *gin.Context) {
 		log.Fatalln("DisplayPlayers error:", err)
 	}
 
-	for _, v := range players {
-		fmt.Printf("player_id:%2d| first_name:%8s| last_name:%s\n",
-			v.ID.Int64,
-			v.FirstName.String,
-			v.LastName.String,
-		)
+	playersIDs := util.PlayersIntoIDs(players)
+
+	_, err = c.Writer.Write([]byte(playersIDs))
+	if err != nil {
+		log.Fatalln("can't write response, err:", err)
 	}
 }

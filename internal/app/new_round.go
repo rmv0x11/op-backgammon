@@ -29,6 +29,8 @@ func (a *Application) NewRound(c *gin.Context) {
 		log.Fatalln("unable added new round, err: ", err)
 	}
 
-	log.Println("new round has id:", roundID)
-
+	_, err = c.Writer.Write([]byte(strconv.FormatInt(roundID, 10)))
+	if err != nil {
+		log.Fatalln("can't write response, err:", err)
+	}
 }
