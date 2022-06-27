@@ -6,8 +6,8 @@ import (
 	"log"
 )
 
-func (i *Implementation) GetPlayers(c *gin.Context) {
-	players, err := i.svc.GetPlayers()
+func (a *Application) GetPlayers(c *gin.Context) {
+	players, err := a.svc.GetPlayers()
 	if err != nil {
 		log.Fatalln("DisplayPlayers error:", err)
 	}

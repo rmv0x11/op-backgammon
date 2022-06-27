@@ -7,11 +7,11 @@ import (
 	"log"
 )
 
-func (i *Implementation) NewPlayer(c *gin.Context) {
+func (a *Application) NewPlayer(c *gin.Context) {
 	firstName := c.Request.URL.Query().Get("firstName")
 	lastName := c.Request.URL.Query().Get("lastName")
 
-	playerID, err := i.svc.NewPlayer(&storage.Player{
+	playerID, err := a.svc.NewPlayer(&storage.Player{
 		FirstName: sql.NullString{firstName, true},
 		LastName:  sql.NullString{lastName, true}},
 	)

@@ -212,7 +212,7 @@ func (d *Database) CreateRoundsTable() error {
 	return err
 }
 
-func (d *Database) NewMatch(match *Match) (int64, error) {
+func (d *Database) NewMatch(m *Match) (int64, error) {
 	query := `INSERT INTO matches(player_one_id, player_two_id, length, date) VALUES (?, ?, ?, ?);
 				SELECT last_insert_rowid();`
 
@@ -223,10 +223,10 @@ func (d *Database) NewMatch(match *Match) (int64, error) {
 	}
 
 	res, err := stmt.Exec(
-		match.PlayerOne.ID,
-		match.PlayerTwo.ID,
-		match.Length,
-		match.Date,
+		m.PlayerOne.ID,
+		m.PlayerTwo.ID,
+		m.Length,
+		m.Date,
 	)
 	if err != nil {
 		log.Fatalln("NewMatch exec error:", err.Error())
@@ -241,4 +241,35 @@ func (d *Database) NewMatch(match *Match) (int64, error) {
 	log.Println("new match created...")
 
 	return matchID, err
+}
+
+func (d *Database) NewRound(r *Round) (int64, error) {
+	query := `insert into rounds(match_id, winner_id, is_mars) values (?, ?, ?);
+		SELECT last_insert_rowid();`
+
+	stmt, err := d.db.Prepare(query)
+	if err != nil {
+		log.Fatalln("NewRound prepare error:", err.Error())
+		return 0, err
+	}
+
+	res, err := stmt.Exec(
+		r.MatchID,
+		r.WinnerID,
+		r.IsMars,
+	)
+	if err != nil {
+		log.Fatalln("NewRound exec error:", err.Error())
+		return 0, err
+	}
+
+	roundID, err := res.LastInsertId()
+	if err != nil {
+		log.Fatalln("can't get round_id, err: ", err.Error())
+	}
+
+	log.Println("new round added...")
+
+	return roundID, err
+
 }

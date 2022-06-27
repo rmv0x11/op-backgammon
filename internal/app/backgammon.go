@@ -6,12 +6,12 @@ import (
 	"log"
 )
 
-type Implementation struct {
+type Application struct {
 	svc *service.Service
 	r   *gin.Engine
 }
 
-func NewBackgammonAPI() *Implementation {
+func NewBackgammonAPI() *Application {
 	svc := service.NewService()
 
 	if err := svc.CreatePlayersTable(); err != nil {
@@ -26,9 +26,9 @@ func NewBackgammonAPI() *Implementation {
 		log.Fatalln("CreateRoundsTable, err: ", err)
 	}
 
-	return &Implementation{svc: svc, r: gin.New()}
+	return &Application{svc: svc, r: gin.New()}
 }
 
-func (i *Implementation) Close() error {
-	return i.Close()
+func (a *Application) Close() error {
+	return a.Close()
 }

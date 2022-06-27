@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (i *Implementation) NewMatch(c *gin.Context) {
+func (a *Application) NewMatch(c *gin.Context) {
 	playerOneValue := c.Request.URL.Query().Get("player_one_id")
 	playerTwoValue := c.Request.URL.Query().Get("player_two_id")
 	lengthValue := c.Request.URL.Query().Get("length")
@@ -27,7 +27,7 @@ func (i *Implementation) NewMatch(c *gin.Context) {
 		log.Fatalln("can't parse length query params, err:")
 	}
 
-	matchID, err := i.svc.NewMatch(playerOneID, playerTwoID, length)
+	matchID, err := a.svc.NewMatch(playerOneID, playerTwoID, length)
 	if err != nil {
 		log.Fatalln("unable get info about new match, err: ", err)
 	}
