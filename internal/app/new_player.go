@@ -7,16 +7,16 @@ import (
 	"log"
 )
 
-func (i *Implementation) AddPlayer(c *gin.Context) {
+func (i *Implementation) NewPlayer(c *gin.Context) {
 	firstName := c.Request.URL.Query().Get("firstName")
 	lastName := c.Request.URL.Query().Get("lastName")
 
-	err := i.svc.AddPlayer(&storage.Player{
+	playerID, err := i.svc.NewPlayer(&storage.Player{
 		FirstName: sql.NullString{firstName, true},
 		LastName:  sql.NullString{lastName, true}},
 	)
 	if err != nil {
 		log.Fatalln("AddPlayer handler error:", err.Error())
 	}
-
+	log.Println("new match has id:", playerID)
 }

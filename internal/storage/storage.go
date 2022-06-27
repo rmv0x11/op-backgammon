@@ -59,24 +59,29 @@ func (d *Database) CreatePlayersTable() error {
 	return err
 }
 
-func (d *Database) InsertPlayer(player *Player) error {
-	insertPlayer := `INSERT INTO players(first_name, last_name) VALUES (?, ?)`
+func (d *Database) NewPlayer(player *Player) (int64, error) {
+	insertPlayer := `INSERT INTO players(first_name, last_name) VALUES (?, ?);
+		SELECT last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(insertPlayer)
 	if err != nil {
 		log.Fatalln("InsertPlayer prepare error:", err.Error())
-		return err
+		return 0, err
 	}
 
-	_, err = stmt.Exec(player.FirstName, player.LastName)
+	res, err := stmt.Exec(player.FirstName, player.LastName)
 	if err != nil {
 		log.Fatalln("InsertPlayer exec error:", err.Error())
-		return err
+		return 0, err
 	}
 
+	playerID, err := res.LastInsertId()
+	if err != nil {
+		log.Fatalln("can't get match_id, err: ", err.Error())
+	}
 	log.Println("inserting new player record...")
 
-	return err
+	return playerID, err
 }
 
 func (d *Database) GetPlayers() ([]*Player, error) {
