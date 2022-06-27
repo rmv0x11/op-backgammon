@@ -13,14 +13,15 @@ func main() {
 
 	os.Remove("backgammon.db")
 
-	impl := app.NewBackgammonAPI()
-	defer impl.Close()
+	a := app.NewBackgammonApp()
+	defer a.Close()
 
 	router := gin.New()
 
-	router.POST("/new_player", impl.NewPlayer)
-	router.GET("/get_players", impl.GetPlayers)
-	router.GET("/new_match", impl.NewMatch)
+	router.POST("/new_player", a.NewPlayer)
+	router.GET("/get_players", a.GetPlayers)
+	router.POST("/new_match", a.NewMatch)
+	router.POST("/new_round", a.NewRound)
 
 	err := router.Run(":1337") //TODO port moved into config
 	if err != nil {

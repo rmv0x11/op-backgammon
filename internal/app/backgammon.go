@@ -11,7 +11,7 @@ type Application struct {
 	r   *gin.Engine
 }
 
-func NewBackgammonAPI() *Application {
+func NewBackgammonApp() *Application {
 	svc := service.NewService()
 
 	if err := svc.CreatePlayersTable(); err != nil {
