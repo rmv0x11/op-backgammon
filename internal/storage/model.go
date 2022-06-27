@@ -10,8 +10,9 @@ type Player struct {
 	LastName   sql.NullString `db:"last_name"`
 	TotalGames sql.NullInt64  `db:"total_games"`
 	WinGames   sql.NullInt64  `db:"win_games"`
-	LoseGames  sql.NullInt64  `db:"lose_games"`
-	MarsGames  sql.NullInt64  `db:"mars_games"`
+	LoseGames  sql.NullInt64  `db:"loses_games"`
+	WinsByMars sql.NullInt64  `db:"wins_by_mars"`
+	LoseByMars sql.NullInt64  `db:"lose_by_mars"`
 	ELORating  sql.NullInt64  `db:"elo_rating"`
 	TotalPrize sql.NullInt64  `db:"total_prize"` //TODO
 }
@@ -30,6 +31,7 @@ type Round struct {
 	ID       sql.NullInt64 `db:"id"`
 	MatchID  sql.NullInt64 `db:"match_id"`
 	WinnerID sql.NullInt64 `db:"winner_id"`
+	LoserID  sql.NullInt64 `db:"loser_id"`
 	IsMars   sql.NullBool  `db:"is_mars"`
 }
 

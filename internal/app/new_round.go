@@ -9,6 +9,8 @@ import (
 func (a *Application) NewRound(c *gin.Context) {
 	matchIDValue := c.Request.URL.Query().Get("match_id")
 	winnerIDValue := c.Request.URL.Query().Get("winner_id")
+	loserIDValue := c.Request.URL.Query().Get("loser_id")
+
 	isMarsValue := c.Request.URL.Query().Get("is_mars")
 
 	matchID, err := strconv.ParseInt(matchIDValue, 10, 64)
@@ -19,12 +21,16 @@ func (a *Application) NewRound(c *gin.Context) {
 	if err != nil {
 		log.Fatalln("can't parse winner_id query params, err:")
 	}
+	loserID, err := strconv.ParseInt(loserIDValue, 10, 64)
+	if err != nil {
+		log.Fatalln("can't parse winner_id query params, err:")
+	}
 	isMars, err := strconv.ParseBool(isMarsValue)
 	if err != nil {
 		log.Fatalln("can't parse is_mars query params, err:")
 	}
 
-	roundID, err := a.svc.NewRound(matchID, winnerID, isMars)
+	roundID, err := a.svc.NewRound(matchID, winnerID, loserID, isMars)
 	if err != nil {
 		log.Fatalln("unable added new round, err: ", err)
 	}

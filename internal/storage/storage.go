@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"github.com/rmv0x11/op-backgammon/internal/model"
 	"log"
 	"time"
 )
@@ -34,7 +35,8 @@ func (d *Database) CreatePlayersTable() error {
 		"total_games" integer,
 		"win_games" integer,
 		"lose_games" integer,
-		"mars_games" integer,
+		"wins_by_mars" integer,
+		"loses_by_mars" integer,
 		"elo_rating" integer,
 		"total_prize" integer
 		);`
@@ -61,18 +63,18 @@ func (d *Database) CreatePlayersTable() error {
 }
 
 func (d *Database) NewPlayer(player *Player) (int64, error) {
-	insertPlayer := `INSERT INTO players(first_name, last_name) VALUES (?, ?);
-		SELECT last_insert_rowid();`
+	insertPlayer := `insert into players(first_name, last_name) VALUES (?, ?);
+		select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(insertPlayer)
 	if err != nil {
-		log.Fatalln("InsertPlayer prepare error:", err.Error())
+		log.Fatalln("insert player prepare error:", err.Error())
 		return 0, err
 	}
 
 	res, err := stmt.Exec(player.FirstName, player.LastName)
 	if err != nil {
-		log.Fatalln("InsertPlayer exec error:", err.Error())
+		log.Fatalln("insert player exec error:", err.Error())
 		return 0, err
 	}
 
@@ -85,16 +87,16 @@ func (d *Database) NewPlayer(player *Player) (int64, error) {
 	return playerID, err
 }
 
-func (d *Database) GetPlayers() ([]*Player, error) {
-	rows, err := d.db.Query("SELECT * FROM players")
+func (d *Database) GetPlayers() ([]*model.Player, error) {
+	rows, err := d.db.Query("select * from players")
 	if err != nil {
-		log.Fatal("GetPlayers query error:", err.Error())
+		log.Fatal("get players query error:", err.Error())
 	}
 	defer rows.Close()
 
-	players := make([]*Player, 0)
+	players := make([]*model.Player, 0)
 	for rows.Next() {
-		player := new(Player)
+		player := new(model.Player)
 
 		scanErr := rows.Scan(
 			&player.ID,
@@ -103,13 +105,14 @@ func (d *Database) GetPlayers() ([]*Player, error) {
 			&player.TotalGames,
 			&player.WinGames,
 			&player.LoseGames,
-			&player.MarsGames,
+			&player.WinsByMars,
+			&player.LoseByMars,
 			&player.ELORating,
 			&player.TotalPrize,
 		)
 
 		if scanErr != nil {
-			log.Fatalln("GetPlayers scan error:", scanErr)
+			log.Fatalln("get players scan error:", scanErr)
 			return nil, scanErr
 		}
 		players = append(players, player)
@@ -118,18 +121,18 @@ func (d *Database) GetPlayers() ([]*Player, error) {
 	return players, nil
 }
 
-func (d *Database) GetPlayerInfo(id int) (*Player, error) {
-	row, err := d.db.Query(`SELECT * FROM players
-		WHERE player_id=?`,
+func (d *Database) GetPlayer(id int64) (*model.Player, error) {
+	row, err := d.db.Query(`select * from players
+		where player_id = ?`,
 		id,
 	)
 	defer row.Close()
 
 	if err != nil {
-		log.Fatal("GetPlayerInfo query error:", err.Error())
+		log.Fatal("get player info query error:", err.Error())
 	}
 
-	player := new(Player)
+	player := new(model.Player)
 
 	scanErr := row.Scan(
 		&player.ID,
@@ -138,13 +141,14 @@ func (d *Database) GetPlayerInfo(id int) (*Player, error) {
 		&player.TotalGames,
 		&player.WinGames,
 		&player.LoseGames,
-		&player.MarsGames,
+		&player.WinsByMars,
+		&player.LoseByMars,
 		&player.ELORating,
 		&player.TotalPrize,
 	)
 
 	if scanErr != nil {
-		log.Fatalln("GetPlayerInfo scan error:", scanErr)
+		log.Fatalln("get player info scan error:", scanErr)
 		return nil, scanErr
 	}
 
@@ -152,27 +156,27 @@ func (d *Database) GetPlayerInfo(id int) (*Player, error) {
 }
 
 func (d *Database) CreateMatchesTable() error {
-	createTable := `CREATE TABLE IF NOT EXISTS matches (
-		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-		"length" int,
-		"status" text,
-		"rounds" text,
-		"player_one_id" int,
-		"player_two_id" int,
-		"date" timestamp
+	createTable := `create table if not exists matches (
+		id integer not null primary key autoincrement,
+		length int,
+		status text,
+		rounds text,
+		player_one_id int,
+		player_two_id int,
+		date timestamp
 		);`
 
-	log.Println("Create matches table...")
+	log.Println("create matches table...")
 
 	stmt, err := d.db.Prepare(createTable)
 	if err != nil {
-		log.Fatalln("CreateMatchesTable prepare error:", err.Error())
+		log.Fatalln("create matches table prepare error:", err.Error())
 		return err
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
-		log.Fatalln("CreateMatchesTable exec error:", err.Error())
+		log.Fatalln("create matches table exec error:", err.Error())
 		return err
 	}
 
@@ -182,25 +186,25 @@ func (d *Database) CreateMatchesTable() error {
 }
 
 func (d *Database) CreateRoundsTable() error {
-	createTable := `CREATE TABLE IF NOT EXISTS rounds (
-		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-		"match_id" integer,
-		"winner_id" int,
+	createTable := `create table if not exists rounds (
+		id integer not null primary key autoincrement,
+		match_id integer,
+		winner_id int,
 		"is_mars" boolean not null check (is_mars in (0,1)),
 		foreign key(match_id) references matches(id)
 		);`
 
-	log.Println("Create rounds table...")
+	log.Println("create rounds table...")
 
 	stmt, err := d.db.Prepare(createTable)
 	if err != nil {
-		log.Fatalln("CreateRoundsTable prepare error:", err.Error())
+		log.Fatalln("create rounds table prepare error:", err.Error())
 		return err
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
-		log.Fatalln("CreateRoundsTable exec error:", err.Error())
+		log.Fatalln("create rounds table exec error:", err.Error())
 		return err
 	}
 
@@ -210,12 +214,12 @@ func (d *Database) CreateRoundsTable() error {
 }
 
 func (d *Database) NewMatch(m *Match) (int64, error) {
-	query := `INSERT INTO matches(player_one_id, player_two_id, length, date) VALUES (?, ?, ?, ?);
-				SELECT last_insert_rowid();`
+	query := `insert into matches(player_one_id, player_two_id, length, date) values (?, ?, ?, ?);
+				select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
-		log.Fatalln("NewMatch prepare error:", err.Error())
+		log.Fatalln("new match prepare error:", err.Error())
 		return 0, err
 	}
 
@@ -226,7 +230,7 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 		m.Date,
 	)
 	if err != nil {
-		log.Fatalln("NewMatch exec error:", err.Error())
+		log.Fatalln("new match exec error:", err.Error())
 		return 0, err
 	}
 
@@ -241,22 +245,23 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 }
 
 func (d *Database) NewRound(r *Round) (int64, error) {
-	query := `insert into rounds(match_id, winner_id, is_mars) values (?, ?, ?);
-		SELECT last_insert_rowid();`
+	query := `insert into rounds(match_id, winner_id,loser_id, is_mars) values (?, ?, ?, ?);
+		select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
-		log.Fatalln("NewRound prepare error:", err.Error())
+		log.Fatalln("new round prepare error:", err.Error())
 		return 0, err
 	}
 
 	res, err := stmt.Exec(
 		r.MatchID,
 		r.WinnerID,
+		r.LoserID,
 		r.IsMars,
 	)
 	if err != nil {
-		log.Fatalln("NewRound exec error:", err.Error())
+		log.Fatalln("new round exec error:", err.Error())
 		return 0, err
 	}
 
@@ -276,20 +281,19 @@ func (d *Database) CreateTournamentTables() error {
 		players text,
 		winner_id integer,
 		status text,
-		date timestamp;
-		select last_insert_rowid();'`
+		date timestamp)`
 
-	log.Println("Create tournaments table...")
+	log.Println("create tournaments table...")
 
 	stmt, err := d.db.Prepare(createTable)
 	if err != nil {
-		log.Fatalln("CreateTournamentsTable prepare error:", err.Error())
+		log.Fatalln("create tournaments table prepare error:", err.Error())
 		return err
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
-		log.Fatalln("CreateTournamentsTable exec error:", err.Error())
+		log.Fatalln("create tournaments table exec error:", err.Error())
 		return err
 	}
 
@@ -300,11 +304,11 @@ func (d *Database) CreateTournamentTables() error {
 
 func (d *Database) NewTournament(IDs string) (int64, error) {
 	query := `insert into tournaments(players, status, date) values (?, ?, ?);
-		SELECT last_insert_rowid();`
+		select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
-		log.Fatalln("NewTournament prepare error:", err.Error())
+		log.Fatalln("new tournament prepare error:", err.Error())
 		return 0, err
 	}
 
@@ -314,7 +318,7 @@ func (d *Database) NewTournament(IDs string) (int64, error) {
 		time.Now(),
 	)
 	if err != nil {
-		log.Fatalln("NewRound exec error:", err.Error())
+		log.Fatalln("new round exec error:", err.Error())
 		return 0, err
 	}
 
@@ -326,4 +330,38 @@ func (d *Database) NewTournament(IDs string) (int64, error) {
 	log.Println("new tournament added...")
 
 	return tournamentID, err
+}
+
+func (d *Database) UpdatePlayer(p *Player) error {
+	query := `update players
+		set total_games = ?,
+			win_games = ?,
+			lose_games = ?,
+			wins_by_mars = ?,
+			lose_by_mars = ?,
+			elo_rating = ?,
+			total_prize = ?
+		where id = ?;`
+
+	stmt, err := d.db.Prepare(query)
+	if err != nil {
+		log.Fatalln("update player prepare error:", err.Error())
+		return err
+	}
+
+	_, err = stmt.Exec(
+		p.TotalGames,
+		p.WinGames,
+		p.LoseGames,
+		p.WinsByMars,
+		p.LoseByMars,
+		p.ELORating,
+		p.TotalPrize,
+	)
+	if err != nil {
+		log.Fatalln("update player exec error:", err.Error())
+		return err
+	}
+
+	return nil
 }
