@@ -28,32 +28,33 @@ func (d *Database) Close() error {
 
 //CreatePlayersTable creates new table Players in Storage
 func (d *Database) CreatePlayersTable() error {
-	createTable := `CREATE TABLE IF NOT EXISTS players (
-		"player_id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-		"first_name" TEXT,
-		"last_name" TEXT,
-		"total_games" integer,
-		"win_games" integer,
-		"lose_games" integer,
-		"wins_by_mars" integer,
-		"loses_by_mars" integer,
-		"elo_rating" integer,
-		"total_prize" integer
+	createTable := `create table if not exists players (
+		player_id integer not null primary key autoincrement,
+		first_name text,
+		last_name text,
+		total_games integer,
+		win_games integer,
+		lose_games integer,
+		experience integer,
+		wins_by_mars integer,
+		loses_by_mars integer,
+		elo_rating integer,
+		total_prize integer
 		);`
 
-	log.Println("Create players table...")
+	log.Println("create players table...")
 
 	stmt, err := d.db.Prepare(createTable)
 	if err != nil {
-		log.Fatalln("CreatePlayersTable prepare error:", err.Error())
+		log.Fatalln("create players table prepare error:", err.Error())
 		return err
 	}
 
-	log.Println("Create players table...")
+	log.Println("create players table...")
 
 	_, err = stmt.Exec()
 	if err != nil {
-		log.Fatalln("CreatePlayersTable exec error:", err.Error())
+		log.Fatalln("create players table exec error:", err.Error())
 		return err
 	}
 
@@ -62,29 +63,32 @@ func (d *Database) CreatePlayersTable() error {
 	return err
 }
 
-func (d *Database) NewPlayer(player *Player) (int64, error) {
-	insertPlayer := `insert into players(first_name, last_name) VALUES (?, ?);
+func (d *Database) NewPlayer(p *Player) (int64, error) {
+	query := `insert into players(first_name, last_name, elo_rating) values (?, ?, ?);
 		select last_insert_rowid();`
 
-	stmt, err := d.db.Prepare(insertPlayer)
+	stmt, err := d.db.Prepare(query)
 	if err != nil {
 		log.Fatalln("insert player prepare error:", err.Error())
 		return 0, err
 	}
 
-	res, err := stmt.Exec(player.FirstName, player.LastName)
+	res, err := stmt.Exec(
+		p.FirstName,
+		p.LastName,
+		p.ELORating)
 	if err != nil {
 		log.Fatalln("insert player exec error:", err.Error())
 		return 0, err
 	}
 
-	playerID, err := res.LastInsertId()
+	pID, err := res.LastInsertId()
 	if err != nil {
 		log.Fatalln("can't get match_id, err: ", err.Error())
 	}
 	log.Println("inserting new player record...")
 
-	return playerID, err
+	return pID, err
 }
 
 func (d *Database) GetPlayers() ([]*model.Player, error) {
@@ -96,26 +100,27 @@ func (d *Database) GetPlayers() ([]*model.Player, error) {
 
 	players := make([]*model.Player, 0)
 	for rows.Next() {
-		player := new(model.Player)
+		p := new(model.Player)
 
 		scanErr := rows.Scan(
-			&player.ID,
-			&player.FirstName,
-			&player.LastName,
-			&player.TotalGames,
-			&player.WinGames,
-			&player.LoseGames,
-			&player.WinsByMars,
-			&player.LoseByMars,
-			&player.ELORating,
-			&player.TotalPrize,
+			&p.ID,
+			&p.FirstName,
+			&p.LastName,
+			&p.TotalGames,
+			&p.WinGames,
+			&p.LoseGames,
+			&p.Experience,
+			&p.WinsByMars,
+			&p.LoseByMars,
+			&p.ELORating,
+			&p.TotalPrize,
 		)
 
 		if scanErr != nil {
 			log.Fatalln("get players scan error:", scanErr)
 			return nil, scanErr
 		}
-		players = append(players, player)
+		players = append(players, p)
 	}
 
 	return players, nil
@@ -132,19 +137,20 @@ func (d *Database) GetPlayer(id int64) (*model.Player, error) {
 		log.Fatal("get player info query error:", err.Error())
 	}
 
-	player := new(model.Player)
+	p := new(model.Player)
 
 	scanErr := row.Scan(
-		&player.ID,
-		&player.FirstName,
-		&player.LastName,
-		&player.TotalGames,
-		&player.WinGames,
-		&player.LoseGames,
-		&player.WinsByMars,
-		&player.LoseByMars,
-		&player.ELORating,
-		&player.TotalPrize,
+		&p.ID,
+		&p.FirstName,
+		&p.LastName,
+		&p.TotalGames,
+		&p.WinGames,
+		&p.LoseGames,
+		&p.Experience,
+		&p.WinsByMars,
+		&p.LoseByMars,
+		&p.ELORating,
+		&p.TotalPrize,
 	)
 
 	if scanErr != nil {
@@ -152,7 +158,7 @@ func (d *Database) GetPlayer(id int64) (*model.Player, error) {
 		return nil, scanErr
 	}
 
-	return player, nil
+	return p, nil
 }
 
 func (d *Database) CreateMatchesTable() error {
@@ -190,7 +196,7 @@ func (d *Database) CreateRoundsTable() error {
 		id integer not null primary key autoincrement,
 		match_id integer,
 		winner_id int,
-		"is_mars" boolean not null check (is_mars in (0,1)),
+		is_mars boolean not null check (is_mars in (0,1)),
 		foreign key(match_id) references matches(id)
 		);`
 

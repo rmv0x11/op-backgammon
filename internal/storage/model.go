@@ -11,6 +11,7 @@ type Player struct {
 	TotalGames sql.NullInt64  `db:"total_games"`
 	WinGames   sql.NullInt64  `db:"win_games"`
 	LoseGames  sql.NullInt64  `db:"loses_games"`
+	Experience sql.NullInt64  `db:"experience"'`
 	WinsByMars sql.NullInt64  `db:"wins_by_mars"`
 	LoseByMars sql.NullInt64  `db:"lose_by_mars"`
 	ELORating  sql.NullInt64  `db:"elo_rating"`

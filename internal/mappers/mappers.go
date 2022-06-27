@@ -14,6 +14,7 @@ func PlayersForDB(p *model.Player) *storage.Player {
 		TotalGames: sql.NullInt64{p.TotalGames, true},
 		WinGames:   sql.NullInt64{p.WinGames, true},
 		LoseGames:  sql.NullInt64{p.LoseGames, true},
+		Experience: sql.NullInt64{p.Experience, true},
 		WinsByMars: sql.NullInt64{p.WinsByMars, true},
 		LoseByMars: sql.NullInt64{p.LoseByMars, true},
 		ELORating:  sql.NullInt64{p.ELORating, true},

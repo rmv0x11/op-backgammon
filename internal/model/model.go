@@ -11,6 +11,7 @@ type Player struct {
 	TotalGames int64
 	WinGames   int64
 	LoseGames  int64
+	Experience int64
 	WinsByMars int64
 	LoseByMars int64
 	ELORating  int64
