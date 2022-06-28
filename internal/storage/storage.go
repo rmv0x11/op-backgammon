@@ -239,8 +239,8 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 	}
 
 	res, err := stmt.Exec(
-		m.PlayerOne.ID,
-		m.PlayerTwo.ID,
+		m.PlayerOneID,
+		m.PlayerTwoID,
 		m.PlayerOnePoints.Int64,
 		m.PlayerTwoPoints.Int64,
 		m.Length,

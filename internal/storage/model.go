@@ -24,9 +24,9 @@ type Match struct {
 	PlayerOnePoints sql.NullInt64  `db:"player_one_score"`
 	PlayerTwoPoints sql.NullInt64  `db:"player_two_score"`
 	Status          sql.NullString `db:"status"`
-	Rounds          []*Round       `db:"rounds"`
-	PlayerOne       *Player        `db:"player_one_id"`
-	PlayerTwo       *Player        `db:"player_two_id"`
+	Rounds          sql.NullString `db:"rounds"`
+	PlayerOneID     sql.NullInt64  `db:"player_one_id"`
+	PlayerTwoID     sql.NullInt64  `db:"player_two_id"`
 	DateCreated     sql.NullTime   `db:"date_created"`
 	DateUpdated     sql.NullTime   `db:"date_updated"`
 }

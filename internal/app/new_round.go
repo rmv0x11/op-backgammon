@@ -15,19 +15,19 @@ func (a *Application) NewRound(c *gin.Context) {
 
 	matchID, err := strconv.ParseInt(matchIDValue, 10, 64)
 	if err != nil {
-		log.Fatalln("can't parse match_id query params, err:")
+		log.Fatalln("can't parse match_id query params, err: ", err)
 	}
 	winnerID, err := strconv.ParseInt(winnerIDValue, 10, 64)
 	if err != nil {
-		log.Fatalln("can't parse winner_id query params, err:")
+		log.Fatalln("can't parse winner_id query params, err: ", err)
 	}
 	loserID, err := strconv.ParseInt(loserIDValue, 10, 64)
 	if err != nil {
-		log.Fatalln("can't parse winner_id query params, err:")
+		log.Fatalln("can't parse winner_id query params, err: ", err)
 	}
 	isMars, err := strconv.ParseBool(isMarsValue)
 	if err != nil {
-		log.Fatalln("can't parse is_mars query params, err:")
+		log.Fatalln("can't parse is_mars query params, err: ", err)
 	}
 
 	roundID, err := a.svc.NewRound(matchID, winnerID, loserID, isMars)
@@ -37,6 +37,6 @@ func (a *Application) NewRound(c *gin.Context) {
 
 	_, err = c.Writer.Write([]byte(strconv.FormatInt(roundID, 10)))
 	if err != nil {
-		log.Fatalln("can't write response, err:", err)
+		log.Fatalln("can't write response, err: ", err)
 	}
 }

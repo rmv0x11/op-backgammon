@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/rmv0x11/op-backgammon/internal/model"
 	"github.com/rmv0x11/op-backgammon/internal/storage"
+	"github.com/rmv0x11/op-backgammon/internal/util"
 )
 
 func PlayersForDB(p *model.Player) *storage.Player {
@@ -24,15 +25,15 @@ func PlayersForDB(p *model.Player) *storage.Player {
 
 func MatchesForDB(m *model.Match) *storage.Match {
 	return &storage.Match{
-		ID:              sql.NullInt64{},
-		Length:          sql.NullInt64{},
-		PlayerOnePoints: sql.NullInt64{},
-		PlayerTwoPoints: sql.NullInt64{},
-		Status:          sql.NullString{},
-		Rounds:          m.Rounds,
-		PlayerOne:       nil,
-		PlayerTwo:       nil,
-		DateCreated:     sql.NullTime{},
-		DateUpdated:     sql.NullTime{},
+		ID:              sql.NullInt64{m.ID, true},
+		Length:          sql.NullInt64{m.Length, true},
+		PlayerOnePoints: sql.NullInt64{m.PlayerOnePoints, true},
+		PlayerTwoPoints: sql.NullInt64{m.PlayerTwoPoints, true},
+		Status:          sql.NullString{m.Status, true},
+		Rounds:          sql.NullString{util.RoundsIntoIDs(m.Rounds), true},
+		PlayerOneID:     sql.NullInt64{m.PlayerOne.ID, true},
+		PlayerTwoID:     sql.NullInt64{m.PlayerTwo.ID, true},
+		DateCreated:     sql.NullTime{m.DateCreated, true},
+		DateUpdated:     sql.NullTime{m.DateUpdated, true},
 	}
 }
