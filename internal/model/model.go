@@ -23,6 +23,10 @@ type Match struct {
 	Length          int64
 	PlayerOnePoints int64
 	PlayerTwoPoints int64
+	PlayerOneLose   int64
+	PlayerTwoLose   int64
+	PlayerOneWin    int64
+	PlayerTwoWin    int64
 	Status          string
 	Rounds          []*Round
 	PlayerOne       *Player

@@ -167,6 +167,10 @@ func (d *Database) CreateMatchesTable() error {
 		length int,
 		player_one_points int,
 		player_two_points int,
+		player_one_lost int,
+		player_two_lost int,
+		player_one_win,
+		player_two_win,
 		status text,
 		rounds text,
 		player_one_id int,
@@ -227,9 +231,13 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 			player_two_id,
 			player_one_points,
 			player_two_points,
+			player_one_lose,
+			player_two_lose,
+			player_one_win,
+			player_two_win,
 			length,
 			date_created) 
-		values (?, ?, ?, ?, ?, ?);
+		values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 			select last_insert_rowid();`
 
 	stmt, err := d.db.Prepare(query)
@@ -241,8 +249,12 @@ func (d *Database) NewMatch(m *Match) (int64, error) {
 	res, err := stmt.Exec(
 		m.PlayerOneID,
 		m.PlayerTwoID,
-		m.PlayerOnePoints.Int64,
-		m.PlayerTwoPoints.Int64,
+		m.PlayerOnePoints,
+		m.PlayerTwoPoints,
+		m.PlayerOneLose,
+		m.PlayerTwoLose,
+		m.PlayerOneWin,
+		m.PlayerTwoWin,
 		m.Length,
 		m.DateCreated,
 	)

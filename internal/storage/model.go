@@ -23,6 +23,10 @@ type Match struct {
 	Length          sql.NullInt64  `db:"length"`
 	PlayerOnePoints sql.NullInt64  `db:"player_one_score"`
 	PlayerTwoPoints sql.NullInt64  `db:"player_two_score"`
+	PlayerOneLose   sql.NullInt64  `db:"player_one_lost"`
+	PlayerTwoLose   sql.NullInt64  `db:"player_two_lost"`
+	PlayerOneWin    sql.NullInt64  `db:"player_one_win"`
+	PlayerTwoWin    sql.NullInt64  `db:"player_two_win"`
 	Status          sql.NullString `db:"status"`
 	Rounds          sql.NullString `db:"rounds"`
 	PlayerOneID     sql.NullInt64  `db:"player_one_id"`

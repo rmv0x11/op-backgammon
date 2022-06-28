@@ -6,7 +6,6 @@ import (
 	"github.com/rmv0x11/op-backgammon/internal/model"
 	"github.com/rmv0x11/op-backgammon/internal/storage"
 	"log"
-	"math"
 	"time"
 )
 
@@ -62,16 +61,4 @@ func updatePlayer(p *model.Player, isWinner, isMars bool) *model.Player {
 	p.TotalGames++
 
 	return p
-}
-
-//W = (1 – P) * M * S
-//
-//L = P * M * S , где:
-//P = 1 / (1 + pow(10,(-D * sqrt(N) / 2000)))
-//func updateELO(p, m, s) int64 {
-//
-//}
-
-func calculateProbability(length, diff float64) float64 {
-	return 1 / (1 + math.Pow(10, -diff*math.Sqrt(length)/2000))
 }
