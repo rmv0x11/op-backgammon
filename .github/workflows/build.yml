@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build_and_pub:
+  build:
     runs-on: ubuntu-latest
 
     env:
